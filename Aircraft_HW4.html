@@ -1,0 +1,270 @@
+<html>
+	<head>
+		<title>View Aircraft</title>
+	<!--
+		<BODY>
+		This is for USC disclaimer
+		</BODY>
+	-->
+	
+	<script>
+	function generateHTML(JsonDoc)
+	{	
+		try{
+			var json=JSON.parse(JsonDoc);
+		}
+		catch(e)
+		{
+			alert("Text in file can't be parsed to Json!");
+			status_1=1;
+			return;
+		}
+		html_text="<html><head><title>JSON Parse Result</title></head><body>";
+		
+		try{
+			var NoOfRows= json.Mainline.Table.Row.length;
+		}
+		catch(err)
+		{
+			//html_text+="Error!!!"
+		}
+		if(NoOfRows>0)
+		{
+				html_text+="<table border='2'>"
+				html_text+="<tr>"
+				var headers = Object.values(json.Mainline.Table.Header.Data)
+				var len= headers.length;
+				for(i=0; i<len; i++)
+				{
+					//var temp=json.Mainline.Table.Header.Data[i];
+					html_text+="<th>"+headers[i]+"</th>"
+					//document.write(temp);
+					//document.write("</br>");
+				}
+				html_text+="</tr>";		
+				//document.write(NoOfRows);
+				
+				for(j=0; j<NoOfRows; j++)
+				{
+					row=json.Mainline.Table.Row[j];
+					
+					var emptyRow= Object.keys(row).length === 0 && row.constructor === Object
+					
+					if(!emptyRow)
+					{
+					//emptyCell=0;
+					
+					/*for(z=0; z<len; z++)
+					{
+						if(row[headers[z]]=="")
+						{
+							emptyCell=emptyCell+1;
+						}
+						else if(row[headers[z]].Hub==""  || Object.keys(row[headers[z]]).length === 0 && row[headers[z]].constructor === Object)
+						{
+							emptyCell=emptyCell+1;
+						}
+						else{
+							break;
+						}
+					}*/
+					//if(emptyCell!=len)
+					//{
+						html_text+="<tr>"
+						//var Airline= json.Mainline.Table.Row[j].headers[0];
+						//html_text+="<td>"+Airline+"</td>"
+						html_text+="<td>"+row[headers[0]]+"</td>"
+						//document.write(Airline);
+						//document.write("</br>");
+						
+						//var IATA= json.Mainline.Table.Row[j].headers[1];
+						//html_text+="<td>"+IATA+"</td>"
+						html_text+="<td>"+row[headers[1]]+"</td>"
+						//document.write(IATA);
+						//document.write("</br>");
+						
+						//var NoOfHubs = json.Mainline.Table.Row[j].headers[2].Hub.length;
+						try{
+							var NoOfHubs= row[headers[2]].Hub.length
+						}
+						catch(err)
+						{	
+						}
+						html_text+="<td>"
+						if(NoOfHubs>0)
+						{
+							if(!(Object.keys(row[headers[2]]).length === 0 && row[headers[2]].constructor))
+							{
+								for(k=0; k<NoOfHubs; k++)
+								{
+									//if(row[headers[2]].Hub[k]!="")
+									//{
+									
+										html_text+="<ul>"
+										if(k==0)
+										{
+											html_text+="<li style=\"font-weight:bold\">"+row[headers[2]].Hub[k]+"</li>"
+										}
+										else
+										{
+											html_text+="<li>"+row[headers[2]].Hub[k]+"</li>"
+										}
+										//html_text+="<li>"+json.Mainline.Table.Row[j].Hubs.Hub[k]+"</li>"
+										html_text+="</ul>"
+										//document.write(json.Mainline.Table.Row[j].Hubs.Hub[k]);
+										//document.write("</br>");
+									//}
+								}
+							}
+						}	
+						html_text+="</td>"
+							
+						html_text+="<td>"+row[headers[3]]+"</td>"
+						
+						//var HomePage= json.Mainline.Table.Row[j].headers[4];
+						//html_text+="<td><a href="+HomePage+">"+HomePage+"</a>"+"</td>"
+						html_text+="<td><a href="+row[headers[4]]+">"+row[headers[4]]+"</a>"+"</td>"
+						//document.write(HomePage);
+						//document.write("</br>");
+						
+						//var Plane= json.Mainline.Table.Row[j].headers[5];
+						//html_text+="<td><img src="+Plane+" height=300 width=300/></td>"
+						html_text+="<td><img src="+row[headers[5]]+" alt=\"No Image\" height=300 width=300/></td>"
+						//document.write(Plane);
+						//document.write("</br>");
+						html_text+="</tr>"
+					//}
+					}
+				}
+				
+				html_text+="</table>"
+				status_1=0;
+		}		
+		else{
+		
+			//self.close();  
+			alert("Sorry! Json contains no rows");
+			//html_text+="<h3>Sorry! Json contains no rows</h3>"
+			status_1=1;
+		
+		}
+		
+		html_text+="</body></html>";
+		
+		//var temp1 = json["Mainline"];
+		//document.write(temp1);
+		//document.write("break");
+		//document.write(json);	
+	}
+	
+	function viewJSON(url)
+	{
+		var URL = url.URL.value;
+		if(URL=="")
+		{
+			alert("Please enter JSON filename!");
+			return false;
+		}
+		else
+		{
+			//var URL = url.URL.value;
+			
+			var status=fileExists(URL)
+			if (!URL.match(".json$", "i")) {
+				alert("Only JSON files allowed!");
+				return;
+			} 
+			
+			//document.write(URL);
+			function loadJSON(URL) {
+				//document.write("In function");
+				if (window.XMLHttpRequest)
+				{// code for IE7+, Firefox, Chrome, Opera, Safari
+					//document.write("Object Creation");
+					var xmlhttp=new XMLHttpRequest();
+					xmlhttp.overrideMimeType("application/json");	
+					//document.write("Created");
+				}
+				else 
+				{// code for IE6, IE5
+					xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");  
+				}
+				//document.write(" Before Open called");
+				xmlhttp.open("GET",URL,false);
+				//document.write("Open called");
+				//xmlhttp.responseType="json";
+				//document.write("Before send");
+				xmlhttp.send();
+				//document.write("After send");
+				var JsonDoc=xmlhttp.responseText;
+				//JSON.parse(xml.responseText) xmlhttp.response
+				//document.write("function called");
+				//document.write(JsonDoc);
+				return JsonDoc;   
+			}
+			
+			if(status)
+			{
+				JsonDoc = loadJSON(URL);
+				//document.write("before if");
+					 if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+					 {  
+						if (JsonDoc.parseError.errorCode != 0) 
+						{
+							var myErr = JsonDoc.parseError;
+							generateError(JsonDoc);
+							hWin = window.open("", "Error", "height=300,width=340");
+							hWin.document.write(html_text);
+						} 
+						else 
+						{  		//generateHTML(JsonDoc);
+								//document.write("Before opening window")
+								hWin = window.open("", "Assignment4", "height=800,width=600");
+								hWin.document.write(html_text);   
+						}
+					} 
+					else //else if FF, execute script once XML object has loaded
+					{  
+						//document.write("in else");
+						JsonDoc.onload=generateHTML(JsonDoc);
+						if(status_1!=1)
+						{
+							hWin = window.open("", "Assignment4", "height=800,width=1200");
+							hWin.document.write(html_text);
+						}
+						status_1=0;						
+					}
+					 //hWin.document.close();  
+			}
+			else{
+				alert("Sorry! The JSON file doesn't exist.");
+			}
+
+		}
+	}
+	
+	function fileExists(url)
+	{
+		var http = new XMLHttpRequest();
+		http.open('HEAD', url, false);
+		http.send();
+		return http.status!=404;
+	}
+	</script>
+	
+	</head>
+	<body>
+		<span style="text-align:center;">
+		<br/>
+		<h2>Enter URL for Airlines List JSON File</h2>
+		
+		<br/>
+		<form name="myform" method="POST" id="location">
+			<input type="text" name="URL" maxlength="255" size="100" value="airlinelist.json" />
+			<br/><br/>
+			<input type="button" name="submit" value="Submit Query" onClick="viewJSON(this.form)" />
+		</form>
+		</span>
+		
+	</body>
+</html>
